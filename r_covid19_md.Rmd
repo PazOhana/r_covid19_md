@@ -1,0 +1,92 @@
+---
+title: "Gtrends & Covid19 // Google's Capstone project"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Lets collect some libs and data:
+  * Check for installed libs
+  * Refresh data sources
+
+```{r Refresh Libs & Data}
+
+##setting libs
+
+#if(!"COVID19" %in% rownames(installed.packages())){
+#  install.packages("COVID19")}
+library(COVID19)
+#if(!"devtools" %in% rownames(installed.packages())){
+#  install.packages("devtools")}
+library(devtools)
+#if(!"gtrendsR" %in% rownames(installed.packages())){
+#  install_github("PMassicotte/gtrendsR")}
+library(gtrendsR)
+#if(!"tidyverse" %in% rownames(installed.packages())){
+#  install.packages(tidyverse)}
+library(tidyverse)
+
+##Loading recent data
+
+###Format Today's date to match the data set 
+  today <- Sys.Date()
+  format(today, format="%Y-%m-%d")
+
+##Define what trends we'd like to follow
+  var1 <- "בידוד"
+  var2 <- "תסמינים"
+  var3 <- "בדיקת קורונה"
+  gtData <- gtrends(c(var1, var2, var3), geo = c("IL", "IL", "IL"), time = paste("2020-01-01", today))
+
+##Clean everything but interest over time and arrange it
+  gtData <- gtData$interest_over_time %>% arrange(date)
+
+###Get Covid19 data for the below countries
+  update_dataset()
+  coviData <-  do.call("rbind", list((covid19(country="israel", start = "2020-01-01", end = Sys.Date()))
+        , (covid19(country="germany", start = "2020-01-01", end = Sys.Date()))
+        , (covid19(country="russia", start = "2020-01-01", end = Sys.Date()))
+        , (covid19(country="italy", start = "2020-01-01", end = Sys.Date()))))
+  
+  glimpse(coviData)
+
+##Plot confirmed over time
+  ggplot(data = coviData,
+        aes(x = date, y = confirmed/population,  color = id)) +
+        geom_point()
+
+##Plot gtrends
+  ggplot(data = gtData,
+        aes(x = date, y = as.numeric(as.character(hits)), color = keyword)) +
+        geom_line()
+## Transforming the data set so we could check for correlations
+        gtData <- gtData %>% spread(key = keyword, value = hits)
+        cor(as.numeric(as.character(gtData$`בדיקת קורונה`)), as.numeric(as.character(gtData$בידוד)),  method = "pearson", use = "complete.obs")
+
+        cor(as.numeric(as.character(gtData$תסמינים)), as.numeric(as.character(gtData$בידוד)),  method = "pearson", use = "complete.obs")
+
+        cor(as.numeric(as.character(gtData$`בדיקת קורונה`)), as.numeric(as.character(gtData$תסמינים)),  method = "pearson", use = "complete.obs")
+        
+##coviData[c("vaccines", "recovered")][is.na(coviData[c("vaccines", "recovered")])] <- 0
+covidCorr <- data.frame("date" = coviData$date, "country" = coviData$id, "confirmed" = as.numeric(as.character(coviData$confirmed))/as.numeric(as.character(coviData$population)), sumimmuned = coviData$vaccines/coviData$population/2+coviData$recovered/coviData$population, "vaccines" = coviData$vaccines/coviData$population/2, "recovered" = coviData$recovered/coviData$population)
+
+glimpse(covidCorr)
+  ggplot(data = covidCorr,
+        aes(x = date, y = sumimmuned,  color = "sumImmuned")) +
+        geom_line()+
+        geom_line(aes(y=confirmed, color = "confirmed"))+
+        geom_line(aes(y=vaccines, color = "vaccinated"))+
+        geom_line(aes(y=recovered, color = "recovered"))+
+        facet_grid(. ~ country)
+
+  ggplot(data = covidCorr,
+        aes(x = date, y = recovered,  color = "recovered")) +
+        geom_line()+
+        geom_line(aes(y=confirmed, color = "confirmed"))+
+        facet_grid(. ~ country)       
+       
+##covidCorr <- covidCorr %>% spread(key = country, value = confirmed, immuned)
+##covidCorr <- covidCorr %>% group_by(week = cut(date, "week")) %>% summarise_if(is.numeric, mean, na.rm = FALSE)
+  
