@@ -44,7 +44,7 @@ library(tidyverse)
   gtData <- gtData$interest_over_time %>% arrange(date)
 
 ###Get Covid19 data for the below countries
-  update_dataset()
+##  update_dataset()
   coviData <-  do.call("rbind", list((covid19(country="israel", start = "2020-01-01", end = Sys.Date()))
         , (covid19(country="germany", start = "2020-01-01", end = Sys.Date()))
         , (covid19(country="russia", start = "2020-01-01", end = Sys.Date()))
