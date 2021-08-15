@@ -6,8 +6,8 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-Below is a showcase meant to measure the correlation between the amount of hits over specific Google search keywords  
-and covid19 actual stats 
+Below is a showcase meant to present the amount of hits over specific Google search keywords in israel  
+and covid19 actual stats:
   
 
 ```{r Showcase and Data analysis, message=FALSE, warning=FALSE}
@@ -102,7 +102,7 @@ and covid19 actual stats
         aes(x = date, y = recovered,  color = "recovered")) +
         geom_line()+
         geom_line(aes(y=confirmed, color = "confirmed"))+
-        facet_grid(. ~ country)       
+        facet_grid(. ~ country)
        
 ```{r summarize, include=FALSE}
 

@@ -1,9 +1,9 @@
 Gtrends & Covid19 // Predicting a pandemic with google trends
 ================
 
-Below is a showcase meant to measure the correlation between the amount
-of hits over specific Google search keywords  
-and covid19 actual stats
+Below is a showcase meant to present the amount of hits over specific
+Google search keywords in israel  
+and covid19 actual stats:
 
 ``` r
 ##First we run a quick setup:
@@ -84,7 +84,7 @@ and covid19 actual stats
       method = "pearson", use = "complete.obs")
 ```
 
-    ## [1] 0.7099807
+    ## [1] 0.7212944
 
 ``` r
 ##Creating a second DF which scales the countries data according to their population:
@@ -113,7 +113,7 @@ and covid19 actual stats
         aes(x = date, y = recovered,  color = "recovered")) +
         geom_line()+
         geom_line(aes(y=confirmed, color = "confirmed"))+
-        facet_grid(. ~ country)       
+        facet_grid(. ~ country)
 ```
 
 ![](r_covid19_md_files/figure-gfm/Showcase%20and%20Data%20analysis-4.png)<!-- -->
