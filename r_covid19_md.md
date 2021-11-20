@@ -34,10 +34,10 @@ and covid19 actual stats:
     var3 <- "בדיקת קורונה"
     
   ##Define what countries we'd like to follow
-    c1 <- "israel"
-    c2 <- "germany"
-    c3 <- "portugal"
-    c4 <- "italy"
+    c1 <- "germany"
+    c2 <- "israel"
+    c3 <- "italy"
+    c4 <- "portugal"
 
 ##Then we load the data into two main datasets, gtData & coviData:  
 
@@ -51,12 +51,13 @@ and covid19 actual stats:
           , (covid19(country=c2, start = "2020-01-01", end = Sys.Date()))
           , (covid19(country=c3, start = "2020-01-01", end = Sys.Date()))
           , (covid19(country=c4, start = "2020-01-01", end = Sys.Date()))))
-
-##Plotting a comparison between the selected countries, showing confirmed cases / population:
+    colnames(coviData)[32] <- "countryName"
     
+##Plotting a comparison between the selected countries, showing confirmed cases / population:
+      
   ##Plot confirmed over time
     ggplot(data = coviData,
-          aes(x = date, y = confirmed/population,  color = id)) +
+          aes(x = date, y = confirmed/population,  color = countryName)) +
           geom_point()
 ```
 
@@ -68,7 +69,8 @@ and covid19 actual stats:
   ##Plot gtrends
     ggplot(data = gtData,
           aes(x = date, y = as.numeric(as.character(hits)), color = keyword)) +
-          geom_line()
+          geom_line()+
+          ylab("Google Trend")
 ```
 
 ![](r_covid19_md_files/figure-gfm/Showcase%20and%20Data%20analysis-2.png)<!-- -->
@@ -84,25 +86,28 @@ and covid19 actual stats:
       method = "pearson", use = "complete.obs")
 ```
 
-    ## [1] 0.7212944
+    ## [1] 0.7175226
 
 ``` r
 ##Creating a second DF which scales the countries data according to their population:
 ##While representing "Immuned" as a summary for whom are twice vaccinated + whom are recovered.
-  covidCorr <- data.frame("date" = coviData$date, "country" = coviData$id, "confirmed" =
+  covidCorr <- data.frame("date" = coviData$date, "country" = coviData$countryName , "confirmed" =
     as.numeric(as.character(coviData$confirmed))/as.numeric(as.character(coviData$population)), sumimmuned =
     coviData$vaccines/coviData$population/2+coviData$recovered/coviData$population, "vaccines" =
     coviData$vaccines/coviData$population/2, "recovered" = coviData$recovered/coviData$population)
 
 ## Plotting all trending data:
-  
   ggplot(data = covidCorr,
         aes(x = date, y = sumimmuned,  color = "sumImmuned")) +
         geom_line()+
         geom_line(aes(y=confirmed, color = "confirmed"))+
         geom_line(aes(y=vaccines, color = "vaccinated"))+
         geom_line(aes(y=recovered, color = "recovered"))+
-        facet_grid(. ~ country)
+        facet_grid(. ~ country)+
+        ylab("Covid - since started")+
+        theme(axis.title.x=element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank())
 ```
 
 ![](r_covid19_md_files/figure-gfm/Showcase%20and%20Data%20analysis-3.png)<!-- -->
@@ -113,7 +118,11 @@ and covid19 actual stats:
         aes(x = date, y = recovered,  color = "recovered")) +
         geom_line()+
         geom_line(aes(y=confirmed, color = "confirmed"))+
-        facet_grid(. ~ country)
+        facet_grid(. ~ country)+
+        ylab("Covid - since started (conf-reco)")+
+        theme(axis.title.x=element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank())
 ```
 
 ![](r_covid19_md_files/figure-gfm/Showcase%20and%20Data%20analysis-4.png)<!-- -->
