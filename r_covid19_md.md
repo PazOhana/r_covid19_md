@@ -9,6 +9,9 @@ and covid19 actual stats:
 ##First we run a quick setup:
 
   ##Check if anything needs to be installed
+    if(!"devtools" %in% rownames(installed.packages())){
+      install.packages("devtools")}
+    library(devtools)
     if(!"COVID19" %in% rownames(installed.packages())){
       install.packages("COVID19")}
     if(!"devtools" %in% rownames(installed.packages())){
@@ -17,12 +20,14 @@ and covid19 actual stats:
       install_github("PMassicotte/gtrendsR")}
     if(!"tidyverse" %in% rownames(installed.packages())){
       install.packages("tidyverse")}
+    if(!"ggdark" %in% rownames(installed.packages())){
+      install_github("nsgrantham/ggdark")}
   
   ##Load required libs
     library(COVID19)
-    library(devtools)
     library(gtrendsR)
     library(tidyverse)
+    library(ggdark)
   
   ##Format Today's date to match the data set 
     today <- Sys.Date()
@@ -58,7 +63,8 @@ and covid19 actual stats:
   ##Plot confirmed over time
     ggplot(data = coviData,
           aes(x = date, y = confirmed/population,  color = countryName)) +
-          geom_point()
+          geom_point()+
+          dark_theme_gray()
 ```
 
 ![](r_covid19_md_files/figure-gfm/Showcase%20and%20Data%20analysis-1.png)<!-- -->
@@ -70,7 +76,8 @@ and covid19 actual stats:
     ggplot(data = gtData,
           aes(x = date, y = as.numeric(as.character(hits)), color = keyword)) +
           geom_line()+
-          ylab("Google Trend")
+          ylab("Google Trend")+
+          dark_theme_gray()
 ```
 
 ![](r_covid19_md_files/figure-gfm/Showcase%20and%20Data%20analysis-2.png)<!-- -->
@@ -105,6 +112,7 @@ and covid19 actual stats:
         geom_line(aes(y=recovered, color = "recovered"))+
         facet_grid(. ~ country)+
         ylab("Covid - since started")+
+        dark_theme_gray()+
         theme(axis.title.x=element_blank(),
             axis.text.x=element_blank(),
             axis.ticks.x=element_blank())
@@ -120,6 +128,7 @@ and covid19 actual stats:
         geom_line(aes(y=confirmed, color = "confirmed"))+
         facet_grid(. ~ country)+
         ylab("Covid - since started (conf-reco)")+
+        dark_theme_gray()+
         theme(axis.title.x=element_blank(),
             axis.text.x=element_blank(),
             axis.ticks.x=element_blank())
